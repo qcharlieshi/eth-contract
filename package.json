@@ -2,6 +2,7 @@
   "name": "eth-contract",
   "version": "0.1.0",
   "private": true,
+  "homepage": "http://qcharlieshi.github.io/eth-contract",
   "dependencies": {
     "axios": "^0.18.0",
     "moment": "^2.22.2",
@@ -11,9 +12,14 @@
     "web3": "^1.0.0-beta.35"
   },
   "scripts": {
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
+  },
+  "devDependencies": {
+    "gh-pages": "^1.2.0"
   }
 }

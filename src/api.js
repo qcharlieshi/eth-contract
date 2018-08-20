@@ -9,7 +9,7 @@ const vaultContract = new web3.eth.Contract(CONTRACT_ABI, VAULT_ADDRESS);
 
 const axiosConfig = {
     getVaultBalance: `https://api.etherscan.io/api?module=account&action=balance&address=${VAULT_ADDRESS}&tag=latest&apikey=${API_KEY}`,
-    getVaultTransactions: `http://api.etherscan.io/api?module=account&action=txlist&address=${VAULT_ADDRESS}&startblock=0&endblock=99999999&sort=asc&apikey=${API_KEY}`
+    getVaultTransactions: `https://api.etherscan.io/api?module=account&action=txlist&address=${VAULT_ADDRESS}&startblock=0&endblock=99999999&sort=asc&apikey=${API_KEY}`
 };
 
 export const getUserBalance = (context) => {
