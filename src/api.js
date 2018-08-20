@@ -57,7 +57,6 @@ export const getVaultBalance = (context) => {
 export const getUserVaultBalance = (context) => {
     vaultContract.methods.balanceOf(context.state.userAccount).call({}, (err, res) => {
         const newBalance = res / WEI;
-        console.log('----- getUserVaultBalance', newBalance, res);
         context.setState(() => {
             return {userVaultBalance: newBalance}
         })
@@ -69,7 +68,7 @@ export const depositToVault = (context) => {
     const userAccount = context.state.userAccount;
 
     vaultContract.methods.deposit().send({from: userAccount, value: amt}, (err, res) => {
-        console.log('----- depositToVault', err, res)
+        context.runBalanceUpdates();
     })
 };
 
@@ -78,22 +77,20 @@ export const withdrawFromVault = (context) => {
     const userAccount = context.state.userAccount;
 
     vaultContract.methods.withdraw(amt).send({from: userAccount}, (err, res) => {
-        console.log('----- withdrawFromVault', err, res)
+        context.runBalanceUpdates();
     })
 };
 
 export const getVaultTransactions = (context) => {
-    console.log('----- getVaultTransactions')
     axios.get(axiosConfig.getVaultTransactions)
         .then(function (response) {
-            console.log('------ VAULT TRANSACTIONS', response.data)
-            // if (response.data.message === "OK") {
-            //     context.setState(() => {
-            //         return {vaultBalance: response.data.result}
-            //     })
-            // } else {
-            //     throw new Error(response.data.message)
-            // }
+            if (response.data.message === 'OK') {
+                context.setState(() => {
+                    return {transactions: response.data.result}
+                })
+            } else {
+                throw new Error(response.data.message)
+            }
         })
         .catch(function (error) {
             console.log(error);

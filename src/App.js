@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
+import TransactionItemComponent from './TransactionItemComponent';
 import {
     depositToVault,
     getUserAccount,
@@ -21,14 +22,16 @@ class App extends Component {
             userVaultBalance: null,
             transactions: [],
             lastUpdated: null,
-            depositInput: 0,
-            withdrawInput: 0
+            depositInput: '',
+            withdrawInput: '',
+            showTransactions: true,
         };
 
         this.runAllUpdates = this.runAllUpdates.bind(this);
-        this.onDeposit = this.onDeposit.bind(this);
+        this.runBalanceUpdates = this.runBalanceUpdates.bind(this);
         this.depositInput = this.depositInput.bind(this);
         this.withdrawInput = this.withdrawInput.bind(this);
+        this.showTransactions = this.showTransactions.bind(this);
     }
 
     componentDidMount() {
@@ -47,7 +50,8 @@ class App extends Component {
 
     runBalanceUpdates() {
         getUserBalance(this);
-        getUserVaultBalance(this)
+        getUserVaultBalance(this);
+        getVaultTransactions(this);
     }
 
     runAllUpdates() {
@@ -58,9 +62,6 @@ class App extends Component {
         });
 
         getVaultTransactions(this)
-    }
-
-    onDeposit() {
     }
 
     depositInput(e) {
@@ -77,23 +78,59 @@ class App extends Component {
         })
     }
 
+    showTransactions() {
+        this.setState((prevState) => {
+            return {showTransactions: !prevState.showTransactions}
+        })
+    }
+
     render() {
-        console.log('----- RENDER', this.state);
+        const showTransactions = (this.state.showTransactions ? 'Hide ' : 'Show ') + ' Transactions';
+
         return (
-            <div>
-                <ul>
-                    <li>{this.state.userAccount}</li>
-                    <li>{this.state.userBalance} ETH</li>
-                    <li>{this.state.userVaultBalance} ETH</li>
-                    <li>{this.state.vaultBalance} ETH</li>
-                </ul>
-                <div>
-                    <button onClick={() => depositToVault(this)}>DEPOSIT</button>
-                    <input onChange={this.depositInput} value={this.state.depositInput}/>
+            <div className="main">
+                <div className="user-balances">
+                    <span className="user-balance-item">
+                        <label>User Wallet Balance</label>
+                        {this.state.userBalance} ETH
+                    </span>
+                    <div className="input-box">
+                        <div>
+                            <input onChange={this.depositInput} value={this.state.depositInput} placeholder="ETH"/>
+                            <button onClick={() => depositToVault(this)}>DEPOSIT</button>
+                        </div>
+                        <div>
+                            <input onChange={this.withdrawInput} value={this.state.withdrawInput} placeholder="ETH"/>
+                            <button onClick={() => withdrawFromVault(this)}>WITHDRAW</button>
+                        </div>
+                        {/*<div className="arrow-image">&#11013;</div>*/}
+                    </div>
+                    <span className="user-balance-item">
+                        <label>User Vault Balance</label>
+                        {this.state.userVaultBalance} ETH
+                    </span>
                 </div>
+
+                <hr/>
+
                 <div>
-                    <button onClick={() => withdrawFromVault(this)}>WITHDRAW</button>
-                    <input onChange={this.withdrawInput} value={this.state.withdrawInput}/>
+                    <button onClick={this.showTransactions}>{showTransactions}</button>
+                    {   this.state.showTransactions ?
+                        <div>
+                            <div className="transaction-column-names">
+                                <span className="column-timestamp">Timestamp</span>
+                                <span className="column-hash">From</span>
+                                <span className="column-hash">To</span>
+                                <span className="column-hash">Hash</span>
+                                <span className="column-value">Value</span>
+                            </div>
+                            {this.state.transactions.map((transaction) => {
+                                return (
+                                    <TransactionItemComponent transaction={transaction} />
+                                )
+                            })}
+                        </div> : null
+                    }
                 </div>
             </div>
         );
